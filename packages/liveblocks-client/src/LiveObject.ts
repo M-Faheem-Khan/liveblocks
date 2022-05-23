@@ -22,7 +22,7 @@ import type {
 } from "./types";
 import { CrdtType, OpCode } from "./types";
 import {
-  creationOpToLiveStructure,
+  creationOpToLiveNode,
   deserialize,
   fromEntries,
   isLiveNode,
@@ -148,7 +148,7 @@ export class LiveObject<O extends LsonObject> extends AbstractCrdt {
     }
 
     const { id, opId, parentKey: key } = op;
-    const child = creationOpToLiveStructure(op);
+    const child = creationOpToLiveNode(op);
 
     if (this._doc.getItem(id) !== undefined) {
       if (this._propToLastUpdate.get(key) === opId) {

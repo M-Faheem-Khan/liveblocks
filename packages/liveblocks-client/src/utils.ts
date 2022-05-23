@@ -40,7 +40,7 @@ export function compact<T>(items: readonly T[]): NonNullable<T>[] {
   return items.filter((item: T): item is NonNullable<T> => item != null);
 }
 
-export function creationOpToLiveStructure(op: CreateOp): LiveNode {
+export function creationOpToLiveNode(op: CreateOp): LiveNode {
   switch (op.type) {
     case OpCode.CREATE_REGISTER:
       return new LiveRegister(op.data);
@@ -53,10 +53,7 @@ export function creationOpToLiveStructure(op: CreateOp): LiveNode {
   }
 }
 
-export function isSameNodeOrChildOf(
-  node: LiveNode,
-  parent: LiveNode
-): boolean {
+export function isSameNodeOrChildOf(node: LiveNode, parent: LiveNode): boolean {
   if (node === parent) {
     return true;
   }
@@ -90,9 +87,7 @@ export function deserialize(
   }
 }
 
-export function isLiveNode(
-  value: unknown
-): value is LiveNode {
+export function isLiveNode(value: unknown): value is LiveNode {
   return (
     isLiveList(value) ||
     isLiveMap(value) ||
