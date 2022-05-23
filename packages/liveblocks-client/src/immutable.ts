@@ -2,13 +2,7 @@ import { LiveList } from "./LiveList";
 import { LiveMap } from "./LiveMap";
 import { LiveObject } from "./LiveObject";
 import { LiveRegister } from "./LiveRegister";
-import type {
-  Json,
-  LiveNode,
-  Lson,
-  LsonObject,
-  StorageUpdate,
-} from "./types";
+import type { Json, LiveNode, Lson, LsonObject, StorageUpdate } from "./types";
 import { findNonSerializableValue, isLiveList, isLiveObject } from "./utils";
 
 function lsonObjectToJson<O extends LsonObject>(
@@ -218,7 +212,11 @@ export function patchLiveObjectKey<O extends LsonObject>(
     isPlainObject(prev) &&
     isPlainObject(next)
   ) {
-    patchLiveObject(value, prev, next);
+    patchLiveObject(
+      value,
+      prev as any, // XXX Look into why this isn't accepted, but next is... :P
+      next
+    );
   } else {
     liveObject.set(key, anyToCrdt(next));
   }

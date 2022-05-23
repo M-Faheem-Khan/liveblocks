@@ -395,7 +395,9 @@ export class LiveMap<
         }
 
         return {
-          value: selfOrRegisterValue(iteratorValue.value),
+          value:
+            // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+            selfOrRegisterValue(iteratorValue.value) as TValue,
         };
       },
     };
