@@ -98,6 +98,7 @@ export function isCrdt(obj: unknown): obj is AbstractCrdt {
   );
 }
 
+// XXX Rename to toLson
 export function selfOrRegisterValue(obj: AbstractCrdt) {
   if (obj instanceof LiveRegister) {
     return obj.data;
