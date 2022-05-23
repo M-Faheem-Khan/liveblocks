@@ -12,7 +12,6 @@ import type {
   LiveMapUpdates,
   LiveNode,
   LiveObjectUpdates,
-  LiveStructure,
   Lson,
   LsonObject,
   NodeMap,
@@ -20,7 +19,6 @@ import type {
   ParentToChildNodeMap,
   SerializedCrdt,
   StorageUpdate,
-  ToJson,
 } from "./types";
 import { CrdtType, OpCode } from "./types";
 import { isJsonObject, parseJson } from "./types/Json";
