@@ -17,7 +17,7 @@ import {
   creationOpToLiveStructure,
   deserialize,
   isCrdt,
-  selfOrRegister,
+  lsonToLive,
   selfOrRegisterValue,
 } from "./utils";
 
@@ -48,7 +48,7 @@ export class LiveMap<
     if (entries) {
       const mappedEntries: Array<[TKey, AbstractCrdt]> = [];
       for (const entry of entries) {
-        const value = selfOrRegister(entry[1]);
+        const value = lsonToLive(entry[1]);
         value._setParentLink(this, entry[0]);
         mappedEntries.push([entry[0], value]);
       }
@@ -244,7 +244,7 @@ export class LiveMap<
       oldValue._detach();
     }
 
-    const item = selfOrRegister(value);
+    const item = lsonToLive(value);
     item._setParentLink(this, key);
 
     this._map.set(key, item);

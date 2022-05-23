@@ -19,7 +19,7 @@ import { CrdtType, OpCode } from "./types";
 import {
   creationOpToLiveStructure,
   deserialize,
-  selfOrRegister,
+  lsonToLive,
   selfOrRegisterValue,
 } from "./utils";
 
@@ -40,7 +40,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
     let position = undefined;
     for (let i = 0; i < items.length; i++) {
       const newPosition = makePosition(position);
-      const item = selfOrRegister(items[i]);
+      const item = lsonToLive(items[i]);
       item._setParentLink(this, newPosition);
       this._items.push(item);
       position = newPosition;
@@ -867,7 +867,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
 
     const position = makePosition(before, after);
 
-    const value = selfOrRegister(element);
+    const value = lsonToLive(element);
     value._setParentLink(this, position);
 
     this._items.push(value);
@@ -1058,7 +1058,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
     const existingId = existingItem._id;
     existingItem._detach();
 
-    const value = selfOrRegister(item);
+    const value = lsonToLive(item);
     value._setParentLink(this, position);
     this._items[index] = value;
 
