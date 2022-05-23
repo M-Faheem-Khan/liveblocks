@@ -8,6 +8,7 @@ import type {
   CreateOp,
   IdTuple,
   InternalLiveStructure,
+  Json,
   LiveListUpdates,
   LiveMapUpdates,
   LiveObjectUpdates,
@@ -96,6 +97,33 @@ export function isCrdt(obj: unknown): obj is AbstractCrdt {
     obj instanceof LiveList ||
     obj instanceof LiveRegister
   );
+}
+
+export function isLiveStructure(
+  value: unknown
+): value is InternalLiveStructure {
+  return (
+    isLiveList(value) ||
+    isLiveMap(value) ||
+    isLiveObject(value) ||
+    isLiveRegister(value)
+  );
+}
+
+export function isLiveList(value: unknown): value is LiveList<Lson> {
+  return value instanceof LiveList;
+}
+
+export function isLiveMap(value: unknown): value is LiveMap<string, Lson> {
+  return value instanceof LiveMap;
+}
+
+export function isLiveObject(value: unknown): value is LiveObject<LsonObject> {
+  return value instanceof LiveObject;
+}
+
+export function isLiveRegister(value: unknown): value is LiveRegister<Json> {
+  return value instanceof LiveRegister;
 }
 
 // XXX Rename to toLson
