@@ -669,7 +669,7 @@ export type {
 export { ClientMsgCode } from "./ClientMsg";
 export type { Json, JsonObject } from "./Json";
 export type {
-  InternalLiveStructure,
+  LiveNode,
   LiveStructure,
   Lson,
   LsonObject,

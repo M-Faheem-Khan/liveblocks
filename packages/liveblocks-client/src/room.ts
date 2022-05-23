@@ -18,9 +18,9 @@ import type {
   EventCallback,
   IdTuple,
   InitialDocumentStateServerMsg,
-  InternalLiveStructure,
   Json,
   JsonObject,
+  LiveNode,
   LiveStructure,
   Lson,
   LsonObject,
@@ -249,7 +249,7 @@ export type State<TPresence extends JsonObject> = {
 
   clock: number;
   opClock: number;
-  items: Map<string, InternalLiveStructure>;
+  items: Map<string, LiveNode>;
   root: LiveObject<LsonObject> | undefined;
   undoStack: HistoryItem[];
   redoStack: HistoryItem[];
@@ -448,7 +448,7 @@ export function makeStateMachine<TPresence extends JsonObject>(
     });
   }
 
-  function addItem(id: string, liveItem: InternalLiveStructure) {
+  function addItem(id: string, liveItem: LiveNode) {
     state.items.set(id, liveItem);
   }
 
@@ -1557,7 +1557,7 @@ export function defaultState(
     // Storage
     clock: 0,
     opClock: 0,
-    items: new Map<string, InternalLiveStructure>(),
+    items: new Map<string, LiveNode>(),
     root: undefined,
     undoStack: [],
     redoStack: [],

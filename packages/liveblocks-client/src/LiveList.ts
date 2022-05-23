@@ -8,9 +8,9 @@ import type {
   CreateListOp,
   CreateOp,
   IdTuple,
-  InternalLiveStructure,
   LiveListUpdateDelta,
   LiveListUpdates,
+  LiveNode,
   Lson,
   Op,
   ParentToChildNodeMap,
@@ -29,9 +29,9 @@ import {
  */
 export class LiveList<TItem extends Lson> extends AbstractCrdt {
   // TODO: Naive array at first, find a better data structure. Maybe an Order statistics tree?
-  private _items: Array<InternalLiveStructure>;
+  private _items: Array<LiveNode>;
 
-  private _implicitlyDeletedItems: Set<InternalLiveStructure>;
+  private _implicitlyDeletedItems: Set<LiveNode>;
 
   constructor(items: TItem[] = []) {
     super();
@@ -567,7 +567,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    * @internal
    */
   _detachChild(
-    child: InternalLiveStructure
+    child: LiveNode
   ): { reverse: Op[]; modified: LiveListUpdates<TItem> } | { modified: false } {
     if (child) {
       const parentKey = nn(child._parentKey);
@@ -593,7 +593,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyRemote(
     newKey: string,
-    child: InternalLiveStructure
+    child: LiveNode
   ): ApplyResult {
     if (this._implicitlyDeletedItems.has(child)) {
       this._implicitlyDeletedItems.delete(child);
@@ -672,7 +672,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyAck(
     newKey: string,
-    child: InternalLiveStructure
+    child: LiveNode
   ): ApplyResult {
     const previousKey = nn(child._parentKey);
 
@@ -749,7 +749,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyUndoRedo(
     newKey: string,
-    child: InternalLiveStructure
+    child: LiveNode
   ): ApplyResult {
     const previousKey = nn(child._parentKey);
 
@@ -796,7 +796,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   _setChildKey(
     newKey: string,
-    child: InternalLiveStructure,
+    child: LiveNode,
     source: OpSource
   ): ApplyResult {
     if (source === OpSource.REMOTE) {
@@ -1194,7 +1194,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
     op: CreateOp,
     key: string
   ): {
-    newItem: InternalLiveStructure;
+    newItem: LiveNode;
     newIndex: number;
   } {
     const newItem = creationOpToLiveStructure(op);
@@ -1226,9 +1226,9 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
 }
 
 class LiveListIterator<T> implements IterableIterator<T> {
-  private _innerIterator: IterableIterator<InternalLiveStructure>;
+  private _innerIterator: IterableIterator<LiveNode>;
 
-  constructor(items: Array<InternalLiveStructure>) {
+  constructor(items: Array<LiveNode>) {
     this._innerIterator = items[Symbol.iterator]();
   }
 
@@ -1265,7 +1265,7 @@ function makeUpdate<TItem extends Lson>(
 
 function setDelta(
   index: number,
-  item: InternalLiveStructure
+  item: LiveNode
 ): LiveListUpdateDelta {
   return {
     index,
@@ -1283,7 +1283,7 @@ function deleteDelta(index: number): LiveListUpdateDelta {
 
 function insertDelta(
   index: number,
-  item: InternalLiveStructure
+  item: LiveNode
 ): LiveListUpdateDelta {
   return {
     index,
@@ -1295,7 +1295,7 @@ function insertDelta(
 function moveDelta(
   previousIndex: number,
   index: number,
-  item: InternalLiveStructure
+  item: LiveNode
 ): LiveListUpdateDelta {
   return {
     index,
@@ -1305,7 +1305,7 @@ function moveDelta(
   };
 }
 
-function sortListItem(items: InternalLiveStructure[]) {
+function sortListItem(items: LiveNode[]) {
   items.sort((itemA, itemB) =>
     compare(itemA._getParentKeyOrThrow(), itemB._getParentKeyOrThrow())
   );

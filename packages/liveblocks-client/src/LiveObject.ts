@@ -7,8 +7,8 @@ import type {
   CreateRootObjectOp,
   DeleteObjectKeyOp,
   IdTuple,
-  InternalLiveStructure,
   JsonObject,
+  LiveNode,
   LiveObjectUpdateDelta,
   LiveObjectUpdates,
   LsonObject,
@@ -207,7 +207,7 @@ export class LiveObject<O extends LsonObject> extends AbstractCrdt {
   /**
    * @internal
    */
-  _detachChild(child: InternalLiveStructure): ApplyResult {
+  _detachChild(child: LiveNode): ApplyResult {
     if (child) {
       const id = nn(this._id);
       const parentKey = nn(child._parentKey);

@@ -6,8 +6,8 @@ import type {
   CreateChildOp,
   CreateMapOp,
   IdTuple,
-  InternalLiveStructure,
   LiveMapUpdates,
+  LiveNode,
   Lson,
   Op,
   ParentToChildNodeMap,
@@ -31,7 +31,7 @@ export class LiveMap<
   TKey extends string,
   TValue extends Lson
 > extends AbstractCrdt {
-  private _map: Map<TKey, InternalLiveStructure>;
+  private _map: Map<TKey, LiveNode>;
 
   constructor(entries?: readonly (readonly [TKey, TValue])[] | undefined);
   /**
@@ -47,7 +47,7 @@ export class LiveMap<
       "Support for calling `new LiveMap(null)` will be removed in @liveblocks/client 0.18. Please call as `new LiveMap()`, or `new LiveMap([])`."
     );
     if (entries) {
-      const mappedEntries: Array<[TKey, InternalLiveStructure]> = [];
+      const mappedEntries: Array<[TKey, LiveNode]> = [];
       for (const entry of entries) {
         const value = lsonToLive(entry[1]);
         value._setParentLink(this, entry[0]);
@@ -181,7 +181,7 @@ export class LiveMap<
   /**
    * @internal
    */
-  _detachChild(child: InternalLiveStructure): ApplyResult {
+  _detachChild(child: LiveNode): ApplyResult {
     const id = nn(this._id);
     const parentKey = nn(child._parentKey);
     const reverse = child._serialize(id, parentKey, this._doc);

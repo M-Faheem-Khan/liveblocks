@@ -1,6 +1,6 @@
 import type {
   CreateChildOp,
-  InternalLiveStructure,
+  LiveNode,
   Op,
   SerializedCrdt,
   StorageUpdate,
@@ -17,8 +17,8 @@ export interface Doc {
   roomId: string;
   generateId: () => string;
   generateOpId: () => string;
-  getItem: (id: string) => InternalLiveStructure | undefined;
-  addItem: (id: string, liveItem: InternalLiveStructure) => void;
+  getItem: (id: string) => LiveNode | undefined;
+  addItem: (id: string, liveItem: LiveNode) => void;
   deleteItem: (id: string) => void;
 
   /**
@@ -40,16 +40,16 @@ export enum OpSource {
   ACK,
 }
 
-// XXX Temporary helper to help convert from AbstractCrdt -> InternalLiveStructure
+// XXX Temporary helper to help convert from AbstractCrdt -> LiveNode
 // XXX Remove me later
 // eslint-disable-next-line no-restricted-syntax
-function crdtAsLive(value: AbstractCrdt): InternalLiveStructure {
-  return value as InternalLiveStructure;
+function crdtAsLive(value: AbstractCrdt): LiveNode {
+  return value as LiveNode;
 }
 
 export abstract class AbstractCrdt {
   //                  ^^^^^^^^^^^^ XXX Make this an interface
-  private __parent?: InternalLiveStructure;
+  private __parent?: LiveNode;
   private __doc?: Doc;
   private __id?: string;
   private __parentKey?: string;
@@ -117,7 +117,7 @@ export abstract class AbstractCrdt {
   /**
    * @internal
    */
-  _setParentLink(parent: InternalLiveStructure, key: string) {
+  _setParentLink(parent: LiveNode, key: string) {
     if (this.__parent != null && this.__parent !== parent) {
       throw new Error("Cannot attach parent if it already exist");
     }
@@ -160,7 +160,7 @@ export abstract class AbstractCrdt {
   /**
    * @internal
    */
-  abstract _detachChild(crdt: InternalLiveStructure): ApplyResult;
+  abstract _detachChild(crdt: LiveNode): ApplyResult;
   /**
    * @internal
    */

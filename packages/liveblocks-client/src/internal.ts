@@ -40,7 +40,7 @@ export type {
   FetchStorageClientMsg,
   IdTuple,
   InitialDocumentStateServerMsg,
-  InternalLiveStructure,
+  LiveNode,
   NodeMap,
   Op,
   ParentToChildNodeMap,

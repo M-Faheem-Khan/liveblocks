@@ -20,7 +20,7 @@ export type LiveStructure =
  * difference with Lson is that all the Json values get represented in
  * a LiveRegister node.
  */
-export type InternalLiveStructure =
+export type LiveNode =
   | LiveStructure
 
   // LiveRegister is for private/internal use only

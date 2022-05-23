@@ -81,8 +81,7 @@ module.exports = {
       },
       {
         selector: 'TSTypeReference[typeName.name="AbstractCrdt"]',
-        message:
-          "Don't refer to AbstractCrdt as a type. Use LiveStructure instead.",
+        message: "Don't refer to AbstractCrdt as a type. Use LiveNode instead.",
       },
       // {
       //   selector: "ForOfStatement",

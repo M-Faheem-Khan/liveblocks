@@ -3,8 +3,8 @@ import { LiveMap } from "./LiveMap";
 import { LiveObject } from "./LiveObject";
 import { LiveRegister } from "./LiveRegister";
 import type {
-  InternalLiveStructure,
   Json,
+  LiveNode,
   Lson,
   LsonObject,
   StorageUpdate,
@@ -246,7 +246,7 @@ export function patchLiveObject<O extends LsonObject>(
   }
 }
 
-function getParentsPath(node: InternalLiveStructure): Array<string | number> {
+function getParentsPath(node: LiveNode): Array<string | number> {
   const path = [];
   while (node._parentKey != null && node._parent != null) {
     if (isLiveList(node._parent)) {

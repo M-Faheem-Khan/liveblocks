@@ -7,10 +7,10 @@ import { LiveRegister } from "./LiveRegister";
 import type {
   CreateOp,
   IdTuple,
-  InternalLiveStructure,
   Json,
   LiveListUpdates,
   LiveMapUpdates,
+  LiveNode,
   LiveObjectUpdates,
   Lson,
   LsonObject,
@@ -40,7 +40,7 @@ export function compact<T>(items: readonly T[]): NonNullable<T>[] {
   return items.filter((item: T): item is NonNullable<T> => item != null);
 }
 
-export function creationOpToLiveStructure(op: CreateOp): InternalLiveStructure {
+export function creationOpToLiveStructure(op: CreateOp): LiveNode {
   switch (op.type) {
     case OpCode.CREATE_REGISTER:
       return new LiveRegister(op.data);
@@ -54,8 +54,8 @@ export function creationOpToLiveStructure(op: CreateOp): InternalLiveStructure {
 }
 
 export function isSameNodeOrChildOf(
-  node: InternalLiveStructure,
-  parent: InternalLiveStructure
+  node: LiveNode,
+  parent: LiveNode
 ): boolean {
   if (node === parent) {
     return true;
@@ -70,7 +70,7 @@ export function deserialize(
   [id, crdt]: IdTuple<SerializedCrdt>,
   parentToChildren: ParentToChildNodeMap,
   doc: Doc
-): InternalLiveStructure {
+): LiveNode {
   switch (crdt.type) {
     case CrdtType.OBJECT: {
       return LiveObject._deserialize([id, crdt], parentToChildren, doc);
@@ -92,7 +92,7 @@ export function deserialize(
 
 export function isLiveStructure(
   value: unknown
-): value is InternalLiveStructure {
+): value is LiveNode {
   return (
     isLiveList(value) ||
     isLiveMap(value) ||
@@ -118,7 +118,7 @@ export function isLiveRegister(value: unknown): value is LiveRegister<Json> {
 }
 
 // XXX Rename to toLson
-export function selfOrRegisterValue(obj: InternalLiveStructure) {
+export function selfOrRegisterValue(obj: LiveNode) {
   if (obj instanceof LiveRegister) {
     return obj.data;
   }
@@ -126,7 +126,7 @@ export function selfOrRegisterValue(obj: InternalLiveStructure) {
   return obj;
 }
 
-export function lsonToLive(value: Lson): InternalLiveStructure {
+export function lsonToLive(value: Lson): LiveNode {
   if (
     value instanceof LiveObject ||
     value instanceof LiveMap ||
