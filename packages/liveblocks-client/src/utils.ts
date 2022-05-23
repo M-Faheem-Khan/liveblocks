@@ -90,7 +90,7 @@ export function deserialize(
   }
 }
 
-export function isLiveStructure(
+export function isLiveNode(
   value: unknown
 ): value is LiveNode {
   return (

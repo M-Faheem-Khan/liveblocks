@@ -17,7 +17,7 @@ import { CrdtType, OpCode } from "./types";
 import {
   creationOpToLiveStructure,
   deserialize,
-  isLiveStructure,
+  isLiveNode,
   lsonToLive,
   selfOrRegisterValue,
 } from "./utils";
@@ -119,7 +119,7 @@ export class LiveMap<
     super._attach(id, doc);
 
     for (const [_key, value] of this._map) {
-      if (isLiveStructure(value)) {
+      if (isLiveNode(value)) {
         value._attach(doc.generateId(), doc);
       }
     }

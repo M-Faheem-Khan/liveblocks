@@ -59,7 +59,7 @@ import { isRootCrdt } from "./types/SerializedCrdt";
 import {
   compact,
   getTreesDiffOperations,
-  isLiveStructure,
+  isLiveNode,
   isSameNodeOrChildOf,
   isTokenValid,
   mergeStorageUpdates,
@@ -723,7 +723,7 @@ export function makeStateMachine<TPresence extends JsonObject>(
     listener?: RoomEventCallbackMap[K] | any,
     options?: { isDeep: boolean }
   ): () => void {
-    if (isLiveStructure(firstParam)) {
+    if (isLiveNode(firstParam)) {
       return crdtSubscribe(firstParam, listener, options);
     } else if (typeof firstParam === "function") {
       return genericSubscribe(firstParam);
