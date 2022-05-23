@@ -4,6 +4,7 @@ import { nn } from "./assert";
 import type {
   CreateChildOp,
   IdTuple,
+  InternalLiveStructure,
   Json,
   Op,
   ParentToChildNodeMap,
@@ -83,7 +84,7 @@ export class LiveRegister<TValue extends Json> extends AbstractCrdt {
     throw new Error("Method not implemented.");
   }
 
-  _detachChild(_crdt: AbstractCrdt): ApplyResult {
+  _detachChild(_crdt: InternalLiveStructure): ApplyResult {
     throw new Error("Method not implemented.");
   }
 

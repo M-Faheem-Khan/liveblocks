@@ -1,4 +1,10 @@
-import type { CreateChildOp, Op, SerializedCrdt, StorageUpdate } from "./types";
+import type {
+  CreateChildOp,
+  InternalLiveStructure,
+  Op,
+  SerializedCrdt,
+  StorageUpdate,
+} from "./types";
 import { OpCode } from "./types";
 
 export type ApplyResult =
@@ -11,8 +17,8 @@ export interface Doc {
   roomId: string;
   generateId: () => string;
   generateOpId: () => string;
-  getItem: (id: string) => AbstractCrdt | undefined;
-  addItem: (id: string, item: AbstractCrdt) => void;
+  getItem: (id: string) => InternalLiveStructure | undefined;
+  addItem: (id: string, liveItem: InternalLiveStructure) => void;
   deleteItem: (id: string) => void;
 
   /**
@@ -34,9 +40,16 @@ export enum OpSource {
   ACK,
 }
 
+// XXX Temporary helper to help convert from AbstractCrdt -> InternalLiveStructure
+// XXX Remove me later
+// eslint-disable-next-line no-restricted-syntax
+function crdtAsLive(value: AbstractCrdt): InternalLiveStructure {
+  return value as InternalLiveStructure;
+}
+
 export abstract class AbstractCrdt {
   //                  ^^^^^^^^^^^^ XXX Make this an interface
-  private __parent?: AbstractCrdt;
+  private __parent?: InternalLiveStructure;
   private __doc?: Doc;
   private __id?: string;
   private __parentKey?: string;
@@ -91,7 +104,7 @@ export abstract class AbstractCrdt {
     switch (op.type) {
       case OpCode.DELETE_CRDT: {
         if (this._parent != null && this._parentKey != null) {
-          return this._parent._detachChild(this);
+          return this._parent._detachChild(crdtAsLive(this));
         }
 
         return { modified: false };
@@ -104,13 +117,13 @@ export abstract class AbstractCrdt {
   /**
    * @internal
    */
-  _setParentLink(parent: AbstractCrdt, key: string) {
+  _setParentLink(parent: InternalLiveStructure, key: string) {
     if (this.__parent != null && this.__parent !== parent) {
       throw new Error("Cannot attach parent if it already exist");
     }
 
     this.__parentKey = key;
-    this.__parent = parent;
+    this.__parent = crdtAsLive(parent);
   }
 
   /**
@@ -121,7 +134,7 @@ export abstract class AbstractCrdt {
       throw new Error("Cannot attach if CRDT is already attached");
     }
 
-    doc.addItem(id, this);
+    doc.addItem(id, crdtAsLive(this));
 
     this.__id = id;
     this.__doc = doc;
@@ -147,7 +160,7 @@ export abstract class AbstractCrdt {
   /**
    * @internal
    */
-  abstract _detachChild(crdt: AbstractCrdt): ApplyResult;
+  abstract _detachChild(crdt: InternalLiveStructure): ApplyResult;
   /**
    * @internal
    */

@@ -1,4 +1,4 @@
-import type { AbstractCrdt, Doc } from "./AbstractCrdt";
+import type { Doc } from "./AbstractCrdt";
 import { nn } from "./assert";
 import { LiveList } from "./LiveList";
 import { LiveMap } from "./LiveMap";
@@ -40,7 +40,7 @@ export function compact<T>(items: readonly T[]): NonNullable<T>[] {
   return items.filter((item: T): item is NonNullable<T> => item != null);
 }
 
-export function creationOpToLiveStructure(op: CreateOp): AbstractCrdt {
+export function creationOpToLiveStructure(op: CreateOp): InternalLiveStructure {
   switch (op.type) {
     case OpCode.CREATE_REGISTER:
       return new LiveRegister(op.data);
@@ -54,8 +54,8 @@ export function creationOpToLiveStructure(op: CreateOp): AbstractCrdt {
 }
 
 export function isSameNodeOrChildOf(
-  node: AbstractCrdt,
-  parent: AbstractCrdt
+  node: InternalLiveStructure,
+  parent: InternalLiveStructure
 ): boolean {
   if (node === parent) {
     return true;
@@ -70,7 +70,7 @@ export function deserialize(
   [id, crdt]: IdTuple<SerializedCrdt>,
   parentToChildren: ParentToChildNodeMap,
   doc: Doc
-): AbstractCrdt {
+): InternalLiveStructure {
   switch (crdt.type) {
     case CrdtType.OBJECT: {
       return LiveObject._deserialize([id, crdt], parentToChildren, doc);
@@ -88,15 +88,6 @@ export function deserialize(
       throw new Error("Unexpected CRDT type");
     }
   }
-}
-
-export function isCrdt(obj: unknown): obj is AbstractCrdt {
-  return (
-    obj instanceof LiveObject ||
-    obj instanceof LiveMap ||
-    obj instanceof LiveList ||
-    obj instanceof LiveRegister
-  );
 }
 
 export function isLiveStructure(
@@ -127,7 +118,7 @@ export function isLiveRegister(value: unknown): value is LiveRegister<Json> {
 }
 
 // XXX Rename to toLson
-export function selfOrRegisterValue(obj: AbstractCrdt) {
+export function selfOrRegisterValue(obj: InternalLiveStructure) {
   if (obj instanceof LiveRegister) {
     return obj.data;
   }

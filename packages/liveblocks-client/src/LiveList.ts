@@ -8,6 +8,7 @@ import type {
   CreateListOp,
   CreateOp,
   IdTuple,
+  InternalLiveStructure,
   LiveListUpdateDelta,
   LiveListUpdates,
   Lson,
@@ -28,14 +29,14 @@ import {
  */
 export class LiveList<TItem extends Lson> extends AbstractCrdt {
   // TODO: Naive array at first, find a better data structure. Maybe an Order statistics tree?
-  private _items: Array<AbstractCrdt>;
+  private _items: Array<InternalLiveStructure>;
 
-  private _implicitlyDeletedItems: Set<AbstractCrdt>;
+  private _implicitlyDeletedItems: Set<InternalLiveStructure>;
 
   constructor(items: TItem[] = []) {
     super();
     this._items = [];
-    this._implicitlyDeletedItems = new Set<AbstractCrdt>();
+    this._implicitlyDeletedItems = new Set();
 
     let position = undefined;
     for (let i = 0; i < items.length; i++) {
@@ -566,7 +567,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    * @internal
    */
   _detachChild(
-    child: AbstractCrdt
+    child: InternalLiveStructure
   ): { reverse: Op[]; modified: LiveListUpdates<TItem> } | { modified: false } {
     if (child) {
       const parentKey = nn(child._parentKey);
@@ -592,7 +593,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyRemote(
     newKey: string,
-    child: AbstractCrdt
+    child: InternalLiveStructure
   ): ApplyResult {
     if (this._implicitlyDeletedItems.has(child)) {
       this._implicitlyDeletedItems.delete(child);
@@ -671,7 +672,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyAck(
     newKey: string,
-    child: AbstractCrdt
+    child: InternalLiveStructure
   ): ApplyResult {
     const previousKey = nn(child._parentKey);
 
@@ -748,7 +749,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   private _applySetChildKeyUndoRedo(
     newKey: string,
-    child: AbstractCrdt
+    child: InternalLiveStructure
   ): ApplyResult {
     const previousKey = nn(child._parentKey);
 
@@ -795,7 +796,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   _setChildKey(
     newKey: string,
-    child: AbstractCrdt,
+    child: InternalLiveStructure,
     source: OpSource
   ): ApplyResult {
     if (source === OpSource.REMOTE) {
@@ -1193,7 +1194,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
     op: CreateOp,
     key: string
   ): {
-    newItem: AbstractCrdt;
+    newItem: InternalLiveStructure;
     newIndex: number;
   } {
     const newItem = creationOpToLiveStructure(op);
@@ -1225,9 +1226,9 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
 }
 
 class LiveListIterator<T> implements IterableIterator<T> {
-  private _innerIterator: IterableIterator<AbstractCrdt>;
+  private _innerIterator: IterableIterator<InternalLiveStructure>;
 
-  constructor(items: Array<AbstractCrdt>) {
+  constructor(items: Array<InternalLiveStructure>) {
     this._innerIterator = items[Symbol.iterator]();
   }
 
@@ -1262,7 +1263,10 @@ function makeUpdate<TItem extends Lson>(
   };
 }
 
-function setDelta(index: number, item: AbstractCrdt): LiveListUpdateDelta {
+function setDelta(
+  index: number,
+  item: InternalLiveStructure
+): LiveListUpdateDelta {
   return {
     index,
     type: "set",
@@ -1277,7 +1281,10 @@ function deleteDelta(index: number): LiveListUpdateDelta {
   };
 }
 
-function insertDelta(index: number, item: AbstractCrdt): LiveListUpdateDelta {
+function insertDelta(
+  index: number,
+  item: InternalLiveStructure
+): LiveListUpdateDelta {
   return {
     index,
     type: "insert",
@@ -1288,7 +1295,7 @@ function insertDelta(index: number, item: AbstractCrdt): LiveListUpdateDelta {
 function moveDelta(
   previousIndex: number,
   index: number,
-  item: AbstractCrdt
+  item: InternalLiveStructure
 ): LiveListUpdateDelta {
   return {
     index,
@@ -1298,7 +1305,7 @@ function moveDelta(
   };
 }
 
-function sortListItem(items: AbstractCrdt[]) {
+function sortListItem(items: InternalLiveStructure[]) {
   items.sort((itemA, itemB) =>
     compare(itemA._getParentKeyOrThrow(), itemB._getParentKeyOrThrow())
   );
