@@ -1076,7 +1076,11 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    * Returns an Array of all the elements in the LiveList.
    */
   toArray(): TItem[] {
-    return this._items.map((entry) => selfOrRegisterValue(entry));
+    return this._items.map(
+      (entry) =>
+        // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+        selfOrRegisterValue(entry) as TItem
+    );
   }
 
   /**
@@ -1133,7 +1137,8 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
       return undefined;
     }
 
-    return selfOrRegisterValue(this._items[index]);
+    // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+    return selfOrRegisterValue(this._items[index]) as TItem | undefined;
   }
 
   /**
@@ -1163,7 +1168,11 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
    */
   map<U>(callback: (value: TItem, index: number) => U): U[] {
     return this._items.map((entry, i) =>
-      callback(selfOrRegisterValue(entry), i)
+      callback(
+        // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+        selfOrRegisterValue(entry) as TItem,
+        i
+      )
     );
   }
 
@@ -1218,7 +1227,7 @@ export class LiveList<TItem extends Lson> extends AbstractCrdt {
   }
 }
 
-class LiveListIterator<T> implements IterableIterator<T> {
+class LiveListIterator<T extends Lson> implements IterableIterator<T> {
   private _innerIterator: IterableIterator<LiveNode>;
 
   constructor(items: Array<LiveNode>) {
@@ -1240,7 +1249,8 @@ class LiveListIterator<T> implements IterableIterator<T> {
     }
 
     return {
-      value: selfOrRegisterValue(result.value),
+      // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+      value: selfOrRegisterValue(result.value) as T,
     };
   }
 }

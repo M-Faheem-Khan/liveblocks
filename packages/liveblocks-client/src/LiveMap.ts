@@ -230,7 +230,9 @@ export class LiveMap<
     if (value == undefined) {
       return undefined;
     }
-    return selfOrRegisterValue(value);
+
+    // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+    return selfOrRegisterValue(value) as TValue | undefined;
   }
 
   /**
@@ -348,7 +350,11 @@ export class LiveMap<
         const entry = iteratorValue.value;
 
         return {
-          value: [entry[0], selfOrRegisterValue(iteratorValue.value[1])],
+          value: [
+            entry[0],
+            // XXX [nodiscardtypeinfoplz] We're discarding type info when calling selfOrRegisterValue here... fix that!
+            selfOrRegisterValue(iteratorValue.value[1]) as TValue,
+          ],
         };
       },
     };

@@ -59,6 +59,7 @@ import { isRootCrdt } from "./types/SerializedCrdt";
 import {
   compact,
   getTreesDiffOperations,
+  isLiveList,
   isLiveNode,
   isSameNodeOrChildOf,
   isTokenValid,
